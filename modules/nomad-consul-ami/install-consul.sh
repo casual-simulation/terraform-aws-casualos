@@ -1,0 +1,1 @@
+/tmp/install-consul.sh --version "${CONSUL_VERSION}"

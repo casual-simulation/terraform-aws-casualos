@@ -1,0 +1,1 @@
+/tmp/install-nomad.sh --version "${NOMAD_VERSION}"

@@ -1,0 +1,72 @@
+{
+    "min_packer_version": "0.12.0",
+    "variables": {
+      "aws_region": "us-east-1",
+      "nomad_version": "0.9.1",
+      "consul_module_version": "v0.7.4",
+      "consul_version": "1.5.1"
+    },
+    "builders": [
+      {
+        "name": "ubuntu20-ami",
+        "ami_name": "nomad-consul-docker-ubuntu20-{{isotime | clean_ami_name}}",
+        "ami_description": "An example of how to build an Ubuntu 20.04 AMI that has Nomad, Consul and Docker",
+        "instance_type": "t2.micro",
+        "region": "{{user `aws_region`}}",
+        "type": "amazon-ebs",
+        "source_ami_filter": {
+         "filters": {
+           "virtualization-type": "hvm",
+           "architecture": "x86_64",
+           "name": "ubuntu/images/hvm-ssd/ubuntu-focal-20.04-amd64-server-*",
+           "block-device-mapping.volume-type": "gp2",
+           "root-device-type": "ebs"
+         },
+         "owners": [
+           "099720109477"
+         ],
+         "most_recent": true
+        },
+        "ssh_username": "ubuntu",
+        "profile": "casualsimulation"
+      }
+    ],
+    "provisioners": [
+      {
+        "type": "shell",
+        "inline": ["mkdir -p /tmp/terraform-aws-nomad/modules"]
+      },
+      {
+        "type": "file",
+        "source": "{{template_dir}}/../install-nomad/install-nomad.sh",
+        "destination": "/tmp",
+        "pause_before": "30s"
+      },
+      {
+        "type": "file",
+        "source": "{{template_dir}}/../install-consul/install-consul.sh",
+        "destination": "/tmp",
+        "pause_before": "30s"
+      },
+      {
+        "type": "shell",
+        "script": "{{template_dir}}/install-docker.sh"
+      },
+      {
+        "type": "shell",
+        "environment_vars": [
+            "NOMAD_VERSION={{user `nomad_version`}}"
+        ],
+        "script": "{{template_dir}}/install-nomad.sh"
+      },
+      {
+        "type": "shell",
+        "environment_vars": [
+            "CONSUL_VERSION={{user `consul_version`}}",
+            "CONSUL_MODULE_VERSION={{user `consul_module_version`}}"
+        ],
+        "script": "{{template_dir}}/install-consul.sh"
+      }
+    ]
+  }
+  
