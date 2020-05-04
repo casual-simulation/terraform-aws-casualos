@@ -151,7 +151,7 @@ function install_binaries {
   fi
 
   log_info "Copying Nomad run script to $run_nomad_dest_path"
-  sudo cp "/tmp/run-nomad" "$run_nomad_dest_path"
+  sudo cp "/tmp/run-nomad.sh" "$run_nomad_dest_path"
   sudo chown "$username:$username" "$run_nomad_dest_path"
   sudo chmod a+x "$run_nomad_dest_path"
 }
