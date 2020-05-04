@@ -49,6 +49,18 @@
         "pause_before": "30s"
       },
       {
+        "type": "file",
+        "source": "{{template_dir}}/../run-nomad/run-nomad.sh",
+        "destination": "/tmp/run-nomad.sh",
+        "pause_before": "30s"
+      },
+      {
+        "type": "file",
+        "source": "{{template_dir}}/../run-consul/run-consul.sh",
+        "destination": "/tmp/run-consul.sh",
+        "pause_before": "30s"
+      },
+      {
         "type": "shell",
         "script": "{{template_dir}}/install-docker.sh"
       },
