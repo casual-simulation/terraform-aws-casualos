@@ -9,7 +9,7 @@
     "builders": [
       {
         "name": "ubuntu20-ami",
-        "ami_name": "nomad-consul-docker-ubuntu20-{{isotime | clean_ami_name}}",
+        "ami_name": "nomad-consul-docker-ubuntu20-{{timestamp}}",
         "ami_description": "An example of how to build an Ubuntu 20.04 AMI that has Nomad, Consul and Docker",
         "instance_type": "t2.micro",
         "region": "{{user `aws_region`}}",
@@ -39,13 +39,13 @@
       {
         "type": "file",
         "source": "{{template_dir}}/../install-nomad/install-nomad.sh",
-        "destination": "/tmp",
+        "destination": "/tmp/install-nomad.sh",
         "pause_before": "30s"
       },
       {
         "type": "file",
         "source": "{{template_dir}}/../install-consul/install-consul.sh",
-        "destination": "/tmp",
+        "destination": "/tmp/install-consul.sh",
         "pause_before": "30s"
       },
       {
