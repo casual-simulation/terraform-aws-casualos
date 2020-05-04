@@ -33,36 +33,29 @@
     ],
     "provisioners": [
       {
-        "type": "shell",
-        "inline": ["mkdir -p /tmp/terraform-aws-nomad/modules"]
-      },
-      {
         "type": "file",
         "source": "{{template_dir}}/../install-nomad/install-nomad.sh",
-        "destination": "/tmp/install-nomad.sh",
-        "pause_before": "30s"
+        "destination": "/tmp/install-nomad.sh"
       },
       {
         "type": "file",
         "source": "{{template_dir}}/../install-consul/install-consul.sh",
-        "destination": "/tmp/install-consul.sh",
-        "pause_before": "30s"
+        "destination": "/tmp/install-consul.sh"
       },
       {
         "type": "file",
         "source": "{{template_dir}}/../run-nomad/run-nomad.sh",
-        "destination": "/tmp/run-nomad.sh",
-        "pause_before": "30s"
+        "destination": "/tmp/run-nomad.sh"
       },
       {
         "type": "file",
         "source": "{{template_dir}}/../run-consul/run-consul.sh",
-        "destination": "/tmp/run-consul.sh",
-        "pause_before": "30s"
+        "destination": "/tmp/run-consul.sh"
       },
       {
         "type": "shell",
-        "script": "{{template_dir}}/install-docker.sh"
+        "script": "{{template_dir}}/install-docker.sh",
+        "pause_before": "30s"
       },
       {
         "type": "shell",
