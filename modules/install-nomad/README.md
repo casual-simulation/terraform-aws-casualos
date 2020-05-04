@@ -1,9 +1,8 @@
 # Nomad Install Script
 
 This folder contains a script for installing Nomad and its dependencies. You can use this script, along with the
-[run-nomad script](https://github.com/hashicorp/terraform-aws-nomad/tree/master/modules/run-nomad) it installs to create a Nomad [Amazon Machine Image
-(AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) that can be deployed in
-[AWS](https://aws.amazon.com/) across an Auto Scaling Group using the [nomad-cluster module](https://github.com/hashicorp/terraform-aws-nomad/tree/master/modules/nomad-cluster).
+[run-nomad script](../run-nomad) it installs to create a Nomad [Amazon Machine Image
+(AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
 
 This script has been tested on the following operating systems:
 
@@ -27,7 +26,7 @@ git clone --branch <VERSION> https://github.com/hashicorp/terraform-aws-nomad.gi
 terraform-aws-nomad/modules/install-nomad/install-nomad --version 0.5.4
 ```
 
-The `install-nomad` script will install Nomad, its dependencies, and the [run-nomad script](https://github.com/hashicorp/terraform-aws-nomad/tree/master/modules/run-nomad).
+The `install-nomad` script will install Nomad, its dependencies, and the [run-nomad script](../run-nomad).
 You can then run the `run-nomad` script when the server is booting to start Nomad and configure it to automatically
 join other nodes to form a cluster.
 
@@ -84,7 +83,7 @@ Install the following:
 * `nomad`: Download the Nomad zip file from the [downloads page](https://www.nomadproject.io/downloads.html) (the
   version number is configurable via the `--version` argument), and extract the `nomad` binary into
   `/opt/nomad/bin`. Add a symlink to the `nomad` binary in `/usr/local/bin`.
-* `run-nomad`: Copy the [run-nomad script](https://github.com/hashicorp/terraform-aws-nomad/tree/master/modules/run-nomad) into `/opt/nomad/bin`.
+* `run-nomad`: Copy the [run-nomad script](../run-nomad) into `/opt/nomad/bin`.
 
 
 ### Follow-up tasks

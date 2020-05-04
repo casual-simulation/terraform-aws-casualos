@@ -1,9 +1,8 @@
 # Consul Install Script
 
 This folder contains a script for installing Consul and its dependencies. Use this script along with the
-[run-consul script](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules/run-consul) to create a Consul [Amazon Machine Image 
-(AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html) that can be deployed in 
-[AWS](https://aws.amazon.com/) across an Auto Scaling Group using the [consul-cluster module](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules/consul-cluster).
+[run-consul script](../run-consul) to create a Consul [Amazon Machine Image 
+(AMI)](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html).
 
 This script has been tested on the following operating systems:
 
@@ -27,7 +26,7 @@ git clone --branch <VERSION> https://github.com/hashicorp/terraform-aws-consul.g
 terraform-aws-consul/modules/install-consul/install-consul --version 0.8.0
 ```
 
-The `install-consul` script will install Consul, its dependencies, and the [run-consul script](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules/run-consul).
+The `install-consul` script will install Consul, its dependencies, and the [run-consul script](../run-consul).
 The `run-consul` script is also run when the server is booting to start Consul and configure it to automatically 
 join other nodes to form a cluster.
 
@@ -91,7 +90,7 @@ Installs the following:
   number is configurable via the `--version` argument), or a package hosted on a precise url configurable with `--dowload-url`
   (useful for installing Consul Enterprise, for example) and extracts the `consul` binary into `/opt/consul/bin`. Adds a
   symlink to the `consul` binary in `/usr/local/bin`.
-* `run-consul`: Copies the [run-consul script](https://github.com/hashicorp/terraform-aws-consul/tree/master/modules/run-consul) into `/opt/consul/bin`.
+* `run-consul`: Copies the [run-consul script](../run-consul) into `/opt/consul/bin`.
 
 ### Installs TLS certificates
 
