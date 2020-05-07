@@ -150,6 +150,7 @@ resource "aws_instance" "server" {
   ami           = data.aws_ami.server_ami.id
   instance_type = var.instance_type
   user_data     = data.template_cloudinit_config.cloudinit.rendered
+  
 
   # Add the deployer SSH key to the instance
   key_name = aws_key_pair.deployer.key_name
@@ -159,4 +160,8 @@ resource "aws_instance" "server" {
 
   # Use the subnet we created
   subnet_id = aws_subnet.default.id
+
+  tags {
+    Name = var.aws_instance_name
+  }
 }

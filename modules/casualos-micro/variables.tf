@@ -21,3 +21,7 @@ variable "aws_ami_owner" {
 
 variable "deployer_ssh_public_key" {
 }
+
+variable "aws_instance_name" {
+    default = "auxPlayer"
+}
