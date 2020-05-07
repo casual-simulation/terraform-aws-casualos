@@ -7,30 +7,16 @@ provider "aws" {
   profile = var.aws_profile
 }
 
-data "template_file" "consul_server_config" {
-  template = file("${path.module}/lib/consul/consul-server.hcl.tpl")
+data "template_file" "consul_config" {
+  template = file("${path.module}/lib/consul/consul.hcl.tpl")
 
   vars = {
     aws_region = var.aws_region
   }
 }
 
-data "template_file" "consul_server_service" {
-  template = file("${path.module}/lib/consul/consul-server.service.tpl")
-
-  vars = {}
-}
-
-data "template_file" "consul_client_config" {
-  template = file("${path.module}/lib/consul/consul-client.hcl.tpl")
-
-  vars = {
-    aws_region = var.aws_region
-  }
-}
-
-data "template_file" "consul_client_service" {
-  template = file("${path.module}/lib/consul/consul-client.service.tpl")
+data "template_file" "consul_service" {
+  template = file("${path.module}/lib/consul/consul.service.tpl")
 
   vars = {}
 }
@@ -39,10 +25,8 @@ data "template_file" "cloud_config" {
   template = file("${path.module}/lib/cloud_config.yml.tpl")
 
   vars = {
-    consul_server_config  = base64encode(data.template_file.consul_server_config.rendered)
-    consul_server_service = base64encode(data.template_file.consul_server_service.rendered)
-    consul_client_config  = base64encode(data.template_file.consul_client_config.rendered)
-    consul_client_service = base64encode(data.template_file.consul_client_service.rendered)
+    consul_config  = base64encode(data.template_file.consul_config.rendered)
+    consul_service = base64encode(data.template_file.consul_service.rendered)
   }
 }
 
