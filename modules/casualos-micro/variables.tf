@@ -3,6 +3,10 @@ variable "instance_type" {
   default = "t3.micro"
 }
 
+variable "aws_profile" {
+    default = "default"
+}
+
 variable "aws_region" {
   default = "us-east-1"
 }
@@ -12,7 +16,7 @@ variable "aws_ami_name_filter" {
 }
 
 variable "aws_ami_owner" {
-  default = "casualsimulation"
+  default = "self"
 }
 
 variable "deployer_ssh_public_key" {
