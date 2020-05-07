@@ -10,3 +10,8 @@ write_files:
       content: ${consul_service}
       owner: root:root
       path: /etc/systemd/system/consul.service
+
+runcmd:
+  - "sudo systemctl daemon-reload"
+  - "sudo systemctl enable consul.service"
+  - "sudo systemctl restart consul.service"
