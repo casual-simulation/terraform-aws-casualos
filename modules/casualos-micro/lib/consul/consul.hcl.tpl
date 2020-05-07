@@ -1,7 +1,6 @@
 
-// Boot as both a client and a server
+// Boot as a server
 server = true
-client = true
 
 data_dir = "/var/consul"
 
