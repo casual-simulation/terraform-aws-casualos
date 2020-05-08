@@ -172,6 +172,35 @@ resource "aws_key_pair" "deployer" {
   public_key = var.deployer_ssh_public_key
 }
 
+# Policy document that allows
+# EC2 instances to assume roles with this trust policy.
+data "aws_iam_policy_document" "ec2_trust_policy" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "sts:AssumeRole",
+    ]
+    principals {
+      type = "Service"
+      identifiers = ["ec2.amazonaws.com"]
+    }
+  }
+}
+
+# The AWS Role for the server EC2 instance
+resource "aws_iam_role" "auxPlayer_role" {
+  name = "auxPlayer_role"
+  path = "/"
+  assume_role_policy = data.aws_iam_policy_document.ec2_trust_policy.json
+}
+
+# The IAM instance profile that the server uses
+resource "aws_iam_instance_profile" "server" {
+  name = "auxPlayer_profile"
+  role = aws_iam_role.auxPlayer_role.name
+}
+
 resource "aws_instance" "server" {
   ami           = data.aws_ami.server_ami.id
   instance_type = var.instance_type
@@ -179,6 +208,8 @@ resource "aws_instance" "server" {
   
   # Add the deployer SSH key to the instance
   key_name = aws_key_pair.deployer.key_name
+
+  iam_instance_profile = aws_iam_instance_profile.server.id
 
   # Use the configured security group
   vpc_security_group_ids = [aws_security_group.default.id]
@@ -191,6 +222,25 @@ resource "aws_instance" "server" {
   }
 }
 
+# Resource policy that lets auxPlayer_role mount EBS volumes
+resource "aws_iam_role_policy" "mount_ebs_volumes" {
+  name   = "mount-ebs-volumes"
+  role   = aws_iam_role.auxPlayer_role.id
+  policy = data.aws_iam_policy_document.mount_ebs_volumes.json
+}
+
+data "aws_iam_policy_document" "mount_ebs_volumes" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "ec2:DescribeVolume*",
+      "ec2:AttachVolume",
+      "ec2:DetachVolume",
+    ]
+    resources = ["*"]
+  }
+}
 data "template_file" "casualos_job" {
   template = file("${path.module}/lib/casualos.hcl.tpl")
 
