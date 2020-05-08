@@ -18,7 +18,7 @@ job "nginx" {
 
   # The "datacenters" parameter specifies the list of datacenters which should
   # be considered when placing this task. This must be provided.
-  datacenters = ["us-east-1"]
+  datacenters = ["${aws_region}"]
 
   # The "type" parameter controls the type of job, which impacts the scheduler's
   # decision on placement. This configuration is optional and defaults to
@@ -41,7 +41,7 @@ job "nginx" {
   #     https://www.nomadproject.io/docs/job-specification/constraint.html
   #
   # constraint {
-  #   attribute = "${attr.kernel.name}"
+  #   attribute = "$${attr.kernel.name}"
   #   value     = "linux"
   # }
 
@@ -205,7 +205,7 @@ job "nginx" {
     #
     # affinity {
        # attribute specifies the name of a node attribute or metadata
-       # attribute = "${node.datacenter}"
+       # attribute = "$${node.datacenter}"
 
        # value specifies the desired attribute value. In this example Nomad
        # will prefer placement in the "us-west1" datacenter.
@@ -227,7 +227,7 @@ job "nginx" {
     #
     # spread {
        # attribute specifies the name of a node attribute or metadata
-       # attribute = "${node.datacenter}"
+       # attribute = "$${node.datacenter}"
 
        # targets can be used to define desired percentages of allocations
        # for each targeted attribute value.
