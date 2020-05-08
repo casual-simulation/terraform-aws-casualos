@@ -21,12 +21,29 @@ data "template_file" "consul_service" {
   vars = {}
 }
 
+
+data "template_file" "nomad_config" {
+  template = file("${path.module}/lib/nomad/nomad.hcl.tpl")
+
+  vars = {
+    aws_region = var.aws_region
+  }
+}
+
+data "template_file" "nomad_service" {
+  template = file("${path.module}/lib/nomad/nomad.service.tpl")
+
+  vars = {}
+}
+
 data "template_file" "cloud_config" {
   template = file("${path.module}/lib/cloud_config.yml.tpl")
 
   vars = {
     consul_config  = base64encode(data.template_file.consul_config.rendered)
     consul_service = base64encode(data.template_file.consul_service.rendered)
+    nomad_config  = base64encode(data.template_file.nomad_config.rendered)
+    nomad_service = base64encode(data.template_file.nomad_service.rendered)
   }
 }
 

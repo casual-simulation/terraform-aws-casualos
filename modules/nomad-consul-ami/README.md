@@ -26,3 +26,5 @@ This assumes you installed Packer to your PATH.
 $ cd ./modules/nomad-consul-ami
 $ packer build packer.json
 ```
+
+When finished, you will have a new AMI named `nomad-consul-docker-ubuntu20-{{timestamp}}` in your AWS account.

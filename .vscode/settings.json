@@ -1,7 +1,7 @@
 {
     "files.associations": {
         "*.service.tpl": "systemd-unit-file",
-        "*.hcl.tpl": "json",
+        "*.hcl.tpl": "text",
         "*.yml.tpl": "yaml"
     }
 }

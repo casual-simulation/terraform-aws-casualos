@@ -2,7 +2,7 @@
 // Boot as a server
 server = true
 
-data_dir = "/var/consul"
+data_dir = "/opt/consul/data"
 
 // Expect to be the only server in the cluster
 bootstrap_expect = 1
