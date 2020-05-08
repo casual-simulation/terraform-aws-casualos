@@ -8,7 +8,6 @@ ConditionDirectoryNotEmpty=/etc/consul.d
 [Service]
 User=consul
 Group=consul
-Type=notify
 ExecStart=/opt/consul/bin/consul agent -config-dir /etc/consul.d
 ExecReload=/opt/consul/bin/consul reload
 KillMode=process
