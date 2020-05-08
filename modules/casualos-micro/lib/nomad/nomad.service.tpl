@@ -3,6 +3,7 @@ Description="HashiCorp Nomad"
 Documentation=https://www.nomadproject.io/
 Requires=network-online.target
 After=network-online.target
+Wants=docker.service
 ConditionDirectoryNotEmpty=/etc/nomad.d
 
 [Service]
