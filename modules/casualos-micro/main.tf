@@ -241,6 +241,13 @@ data "aws_iam_policy_document" "mount_ebs_volumes" {
     resources = ["*"]
   }
 }
+
+# EBS volume used by MongoDB to store persistent data
+resource "aws_ebs_volume" "mongodb" {
+  availability_zone = aws_instance.server.availability_zone
+  size              = 40
+}
+
 data "template_file" "casualos_job" {
   template = file("${path.module}/lib/casualos.hcl.tpl")
 
@@ -252,4 +259,17 @@ data "template_file" "casualos_job" {
 resource "local_file" "casualos_job_file" {
     content     = data.template_file.casualos_job.rendered
     filename = "${path.module}/out/casualos.hcl"
+}
+
+output "ebs_volume" {
+    value = <<EOM
+# volume registration
+type = "csi"
+id = "mongodb"
+name = "mongodb"
+external_id = "${aws_ebs_volume.mongodb.id}"
+access_mode = "single-node-writer"
+attachment_mode = "file-system"
+plugin_id = "aws-ebs0"
+EOM
 }
