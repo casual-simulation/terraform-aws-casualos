@@ -161,7 +161,7 @@ resource "aws_instance" "server" {
   # Use the subnet we created
   subnet_id = aws_subnet.default.id
 
-  tags {
+  tags = {
     Name = var.aws_instance_name
   }
 }
