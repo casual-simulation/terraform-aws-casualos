@@ -149,6 +149,15 @@ resource "aws_security_group" "default" {
     cidr_blocks = ["10.0.0.0/16"]
   }
 
+  # Nomad access from anywhere
+  # TODO: Make this secure
+  ingress {
+    from_port   = 4646
+    to_port     = 4646
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
   # outbound internet access
   egress {
     from_port   = 0
@@ -168,7 +177,6 @@ resource "aws_instance" "server" {
   instance_type = var.instance_type
   user_data     = data.template_cloudinit_config.cloudinit.rendered
   
-
   # Add the deployer SSH key to the instance
   key_name = aws_key_pair.deployer.key_name
 
@@ -181,4 +189,17 @@ resource "aws_instance" "server" {
   tags = {
     Name = var.aws_instance_name
   }
+}
+
+data "template_file" "casualos_job" {
+  template = file("${path.module}/lib/casualos.hcl.tpl")
+
+  vars = {
+    aws_region = var.aws_region
+  }
+}
+
+resource "local_file" "casualos_job_file" {
+    content     = data.template_file.casualos_job.rendered
+    filename = "${path.module}/out/casualos.hcl"
 }
