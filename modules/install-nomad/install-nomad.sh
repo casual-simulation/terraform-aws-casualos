@@ -106,6 +106,9 @@ function create_nomad_user {
     log_info "Creating user named $username"
     sudo useradd "$username"
   fi
+
+  # Add the nomad user to the docker group
+  sudo usermod -a -G docker "$username"
 }
 
 function create_nomad_install_paths {
