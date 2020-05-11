@@ -387,31 +387,3 @@ resource "local_file" "casualos_job_file" {
     content     = data.template_file.casualos_job.rendered
     filename = "${path.module}/out/casualos.hcl"
 }
-
-data "template_file" "aws_ebs_controller_job" {
-  template = file("${path.module}/lib/aws-ebs-controller.hcl.tpl")
-
-  vars = {
-    aws_region = var.aws_region
-  }
-}
-
-# The nomad job file that can be used to run CasualOS.
-resource "local_file" "aws_ebs_controller_job_file" {
-    content     = data.template_file.aws_ebs_controller_job.rendered
-    filename = "${path.module}/out/aws-ebs-controller.hcl"
-}
-
-data "template_file" "aws_ebs_nodes_job" {
-  template = file("${path.module}/lib/aws-ebs-nodes.hcl.tpl")
-
-  vars = {
-    aws_region = var.aws_region
-  }
-}
-
-# The nomad job file that can be used to run CasualOS.
-resource "local_file" "aws_ebs_nodes_job_file" {
-    content     = data.template_file.aws_ebs_nodes_job.rendered
-    filename = "${path.module}/out/aws-ebs-nodes.hcl"
-}
