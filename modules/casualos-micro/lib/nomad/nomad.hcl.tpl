@@ -7,6 +7,12 @@ server {
 
 client {
   enabled = true
+
+  host_volume "mongodb" {
+    // /dev/sdh is the mount path of the EBS volume
+    path = "/dev/sdh/mongodb"
+  }
+
 }
 
 // Expect to be the only server in the cluster
