@@ -17,3 +17,7 @@ data_dir = "/opt/nomad/data"
 consul {
   address = "127.0.0.1:8500"
 }
+
+acl {
+  enabled = true
+}

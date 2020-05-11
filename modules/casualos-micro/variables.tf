@@ -30,7 +30,7 @@ variable "deployer_ssh_public_key" {
 }
 
 variable "aws_instance_name" {
-    default = "auxPlayer"
+    default = "casualos"
     description = "The name of the new instance"
 }
 

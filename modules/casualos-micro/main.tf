@@ -232,7 +232,7 @@ data "aws_iam_policy_document" "ec2_trust_policy" {
 }
 
 # The AWS Role for the server EC2 instance
-resource "aws_iam_role" "auxPlayer_role" {
+resource "aws_iam_role" "casualos_server" {
   name = "casualos-instance-role"
   path = "/"
   assume_role_policy = data.aws_iam_policy_document.ec2_trust_policy.json
@@ -240,8 +240,8 @@ resource "aws_iam_role" "auxPlayer_role" {
 
 # The IAM instance profile that the server uses
 resource "aws_iam_instance_profile" "server" {
-  name = "auxPlayer_profile"
-  role = aws_iam_role.auxPlayer_role.name
+  name = "casualos-instance-profile"
+  role = aws_iam_role.casualos_server.name
 }
 
 # TODO: Use AutoScaling groups with the cluster implementation
@@ -279,8 +279,16 @@ resource "aws_iam_instance_profile" "server" {
 #   vpc_zone_identifier = [aws_subnet.default.id]
 # }
 
+# The Secret that the instance will update with the bootstrap token information
+resource "aws_secretsmanager_secret" "nomad_bootstrap_token" { 
+  name = "casualos/nomad/BootstrapToken"
+}
+
 # The EC2 instance that represents the server
 resource "aws_instance" "server" {
+  # Needs the bootstrap token secret to be created first
+  depends_on = [aws_secretsmanager_secret.nomad_bootstrap_token]
+
   ami           = data.aws_ami.server_ami.id
   instance_type = var.instance_type
   user_data     = data.template_cloudinit_config.cloudinit.rendered
@@ -314,10 +322,10 @@ resource "aws_lb_target_group_attachment" "server" {
     port = 80
 }
 
-# Resource policy that lets auxPlayer_role mount EBS volumes
+# Resource policy that lets casualos_server mount EBS volumes
 resource "aws_iam_role_policy" "mount_ebs_volumes" {
   name   = "mount-ebs-volumes"
-  role   = aws_iam_role.auxPlayer_role.id
+  role   = aws_iam_role.casualos_server.id
   policy = data.aws_iam_policy_document.mount_ebs_volumes.json
 }
 
@@ -336,9 +344,33 @@ data "aws_iam_policy_document" "mount_ebs_volumes" {
   }
 }
 
+# Resource policy that lets casualos_server set secretsmanager secrets
+resource "aws_iam_role_policy" "put_secretsmanager_secrets" {
+  name   = "put-secretsmanager-secrets"
+  role   = aws_iam_role.casualos_server.id
+  policy = data.aws_iam_policy_document.put_secretsmanager_secrets.json
+}
+
+# The policy document that gives the EC2 instance the ability to
+# Set a secret's value.
+data "aws_iam_policy_document" "put_secretsmanager_secrets" {
+  statement {
+    effect = "Allow"
+
+    actions = [
+      "secretsmanager:PutSecretValue",
+    ]
+    resources = [
+      # Allow access only to the nomad bootstrap token secret
+      aws_secretsmanager_secret.nomad_bootstrap_token.arn
+    ]
+  }
+}
+
 # EBS volume used by MongoDB to store persistent data
+# Needs to be in the same availabilit zone as the instance
 resource "aws_ebs_volume" "mongodb" {
-  availability_zone = aws_instance.server.availability_zone
+  availability_zone = aws_subnet.default.0.availability_zone
   size              = var.aws_ec2_block_size
 }
 

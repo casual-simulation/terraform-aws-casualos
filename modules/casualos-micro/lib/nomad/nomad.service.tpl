@@ -11,8 +11,14 @@ User=nomad
 Group=nomad
 ExecStart=/opt/nomad/bin/nomad agent -config /etc/nomad.d
 KillMode=process
+KillSignal=SIGINT
+LimitNOFILE=infinity
+LimitNPROC=infinity
 Restart=on-failure
-LimitNOFILE=65536
+RestartSec=2
+StartLimitBurst=3
+StartLimitIntervalSec=10
+TasksMax=infinity
 
 [Install]
 WantedBy=multi-user.target
