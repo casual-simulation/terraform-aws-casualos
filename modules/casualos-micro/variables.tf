@@ -33,3 +33,8 @@ variable "aws_instance_name" {
     default = "auxPlayer"
     description = "The name of the new instance"
 }
+
+variable "aws_ec2_block_size" {
+  default = 40
+  description = "The size of the disk (in GiBs) that should be used to store CasualOS data."
+}

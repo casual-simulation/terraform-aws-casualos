@@ -103,34 +103,63 @@ resource "aws_subnet" "default" {
   map_public_ip_on_launch = true
 }
 
+# Create a load balancer that provides access to the system
+resource "aws_lb" "load_balancer" { 
+  name = "casualos-alb"
+  internal = false
+  load_balancer_type = "application"
+
+  security_groups = [aws_security_group.load_balancer.id]
+  subnets = [aws_subnet.default.id]
+}
+
+resource "aws_lb_target_group" "instances" {
+  name = "casualos-tg-instances"
+  port = 80
+  protocol = "HTTP"
+  vpc_id = aws_vpc.default.id
+}
+
+# The HTTP listener for the load balancer
+resource "aws_lb_listener" "load_balancer_http" {
+  load_balancer_arn = aws_lb.load_balancer.arn
+  port = "80"
+  protocol = "HTTP"
+
+  default_action {
+    type = "forward"
+    target_group_arn = aws_lb_target_group.instances.arn
+  }
+}
+
 # A security group for the ELB so it is accessible via the web
-# resource "aws_security_group" "elb" {
-#   name        = "terraform_example_elb"
-#   description = "Used in the terraform"
-#   vpc_id      = "${aws_vpc.default.id}"
+resource "aws_security_group" "load_balancer" {
+  name        = "casualos-sg-load_balancer"
+  description = "Used by the load balancer"
+  vpc_id      = aws_vpc.default.id
 
-#   # HTTP access from anywhere
-#   ingress {
-#     from_port   = 80
-#     to_port     = 80
-#     protocol    = "tcp"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
+  # HTTP access from anywhere
+  ingress {
+    from_port   = 80
+    to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-#   # outbound internet access
-#   egress {
-#     from_port   = 0
-#     to_port     = 0
-#     protocol    = "-1"
-#     cidr_blocks = ["0.0.0.0/0"]
-#   }
-# }
+  # outbound internet access
+  egress {
+    from_port   = 0
+    to_port     = 0
+    protocol    = "-1"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+}
 
 # Our default security group to access
 # the instances over SSH and HTTP
-resource "aws_security_group" "default" {
-  name        = "casualos-security-group"
-  description = "Used in the terraform"
+resource "aws_security_group" "instance" {
+  name        = "casualos-sg-instance"
+  description = "Used for EC2 instances running CasualOS"
   vpc_id      = aws_vpc.default.id
 
   # SSH access from anywhere
@@ -168,7 +197,7 @@ resource "aws_security_group" "default" {
 }
 
 resource "aws_key_pair" "deployer" {
-  key_name   = "deployer-key"
+  key_name   = "casualos-deployer-key"
   public_key = var.deployer_ssh_public_key
 }
 
@@ -190,7 +219,7 @@ data "aws_iam_policy_document" "ec2_trust_policy" {
 
 # The AWS Role for the server EC2 instance
 resource "aws_iam_role" "auxPlayer_role" {
-  name = "auxPlayer_role"
+  name = "casualos-instance-role"
   path = "/"
   assume_role_policy = data.aws_iam_policy_document.ec2_trust_policy.json
 }
@@ -201,26 +230,61 @@ resource "aws_iam_instance_profile" "server" {
   role = aws_iam_role.auxPlayer_role.name
 }
 
-resource "aws_instance" "server" {
-  ami           = data.aws_ami.server_ami.id
+# The launch configuration that specifies how to
+# create an EC2 instance with CasualOS
+resource "aws_launch_configuration" "server" { 
+  name_prefix = "casualos-lc"
+  image_id = data.aws_ami.server_ami.id
   instance_type = var.instance_type
   user_data     = data.template_cloudinit_config.cloudinit.rendered
-  
-  # Add the deployer SSH key to the instance
   key_name = aws_key_pair.deployer.key_name
 
   iam_instance_profile = aws_iam_instance_profile.server.id
+  security_groups = [aws_security_group.instance.id]
+  
+  associate_public_ip_address = true
 
-  # Use the configured security group
-  vpc_security_group_ids = [aws_security_group.default.id]
-
-  # Use the subnet we created
-  subnet_id = aws_subnet.default.id
-
-  tags = {
-    Name = var.aws_instance_name
+  # Tell Terraform to create a new instance before destroying the old one
+  lifecycle {
+    create_before_destroy = true
   }
 }
+
+# The Autoscaling group that the CasualOS instances run in.
+# This is useful because AWS will be able to automatically create a new instance
+# should one fail.
+resource "aws_autoscaling_group" "server" { 
+  name = "auxPlayer-asg"
+  min_size = 1
+  max_size = 1
+  desired_capacity = 1
+
+  launch_configuration = aws_launch_configuration.server.name
+  target_group_arns = [aws_lb_target_group.instances.arn]
+  vpc_zone_identifier = [aws_subnet.default.id]
+}
+
+# # The EC2 instance that represents the server
+# resource "aws_instance" "server" {
+#   ami           = data.aws_ami.server_ami.id
+#   instance_type = var.instance_type
+#   user_data     = data.template_cloudinit_config.cloudinit.rendered
+  
+#   # Add the deployer SSH key to the instance
+#   key_name = aws_key_pair.deployer.key_name
+
+#   iam_instance_profile = aws_iam_instance_profile.server.id
+
+#   # Use the configured security group
+#   vpc_security_group_ids = [aws_security_group.default.id]
+
+#   # Use the subnet we created
+#   subnet_id = aws_subnet.default.id
+
+#   tags = {
+#     Name = var.aws_instance_name
+#   }
+# }
 
 # Resource policy that lets auxPlayer_role mount EBS volumes
 resource "aws_iam_role_policy" "mount_ebs_volumes" {
@@ -229,6 +293,8 @@ resource "aws_iam_role_policy" "mount_ebs_volumes" {
   policy = data.aws_iam_policy_document.mount_ebs_volumes.json
 }
 
+# The policy document that gives the EC2 instance the ability to
+# List, mount, and attach EBS volumes.
 data "aws_iam_policy_document" "mount_ebs_volumes" {
   statement {
     effect = "Allow"
@@ -244,8 +310,8 @@ data "aws_iam_policy_document" "mount_ebs_volumes" {
 
 # EBS volume used by MongoDB to store persistent data
 resource "aws_ebs_volume" "mongodb" {
-  availability_zone = aws_instance.server.availability_zone
-  size              = 40
+  availability_zone = aws_subnet.default.availability_zone
+  size              = var.aws_ec2_block_size
 }
 
 data "template_file" "casualos_job" {
@@ -256,20 +322,8 @@ data "template_file" "casualos_job" {
   }
 }
 
+# The nomad job file that can be used to run CasualOS.
 resource "local_file" "casualos_job_file" {
     content     = data.template_file.casualos_job.rendered
     filename = "${path.module}/out/casualos.hcl"
-}
-
-output "ebs_volume" {
-    value = <<EOM
-# volume registration
-type = "csi"
-id = "mongodb"
-name = "mongodb"
-external_id = "${aws_ebs_volume.mongodb.id}"
-access_mode = "single-node-writer"
-attachment_mode = "file-system"
-plugin_id = "aws-ebs0"
-EOM
 }
