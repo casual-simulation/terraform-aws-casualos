@@ -230,61 +230,75 @@ resource "aws_iam_instance_profile" "server" {
   role = aws_iam_role.auxPlayer_role.name
 }
 
-# The launch configuration that specifies how to
-# create an EC2 instance with CasualOS
-resource "aws_launch_configuration" "server" { 
-  name_prefix = "casualos-lc"
-  image_id = data.aws_ami.server_ami.id
-  instance_type = var.instance_type
-  user_data     = data.template_cloudinit_config.cloudinit.rendered
-  key_name = aws_key_pair.deployer.key_name
-
-  iam_instance_profile = aws_iam_instance_profile.server.id
-  security_groups = [aws_security_group.instance.id]
-  
-  associate_public_ip_address = true
-
-  # Tell Terraform to create a new instance before destroying the old one
-  lifecycle {
-    create_before_destroy = true
-  }
-}
-
-# The Autoscaling group that the CasualOS instances run in.
-# This is useful because AWS will be able to automatically create a new instance
-# should one fail.
-resource "aws_autoscaling_group" "server" { 
-  name = "auxPlayer-asg"
-  min_size = 1
-  max_size = 1
-  desired_capacity = 1
-
-  launch_configuration = aws_launch_configuration.server.name
-  target_group_arns = [aws_lb_target_group.instances.arn]
-  vpc_zone_identifier = [aws_subnet.default.id]
-}
-
-# # The EC2 instance that represents the server
-# resource "aws_instance" "server" {
-#   ami           = data.aws_ami.server_ami.id
+# TODO: Use AutoScaling groups with the cluster implementation
+# # The launch configuration that specifies how to
+# # create an EC2 instance with CasualOS
+# resource "aws_launch_configuration" "server" { 
+#   name_prefix = "casualos-lc"
+#   image_id = data.aws_ami.server_ami.id
 #   instance_type = var.instance_type
 #   user_data     = data.template_cloudinit_config.cloudinit.rendered
-  
-#   # Add the deployer SSH key to the instance
 #   key_name = aws_key_pair.deployer.key_name
 
 #   iam_instance_profile = aws_iam_instance_profile.server.id
+#   security_groups = [aws_security_group.instance.id]
+  
+#   associate_public_ip_address = true
 
-#   # Use the configured security group
-#   vpc_security_group_ids = [aws_security_group.default.id]
-
-#   # Use the subnet we created
-#   subnet_id = aws_subnet.default.id
-
-#   tags = {
-#     Name = var.aws_instance_name
+#   # Tell Terraform to create a new instance before destroying the old one
+#   lifecycle {
+#     create_before_destroy = true
 #   }
 # }
+
+# # The Autoscaling group that the CasualOS instances run in.
+# # This is useful because AWS will be able to automatically create a new instance
+# # should one fail.
+# resource "aws_autoscaling_group" "server" { 
+#   name = "auxPlayer-asg"
+#   min_size = 1
+#   max_size = 1
+#   desired_capacity = 1
+
+#   launch_configuration = aws_launch_configuration.server.name
+#   target_group_arns = [aws_lb_target_group.instances.arn]
+#   vpc_zone_identifier = [aws_subnet.default.id]
+# }
+
+# The EC2 instance that represents the server
+resource "aws_instance" "server" {
+  ami           = data.aws_ami.server_ami.id
+  instance_type = var.instance_type
+  user_data     = data.template_cloudinit_config.cloudinit.rendered
+  
+  # Add the deployer SSH key to the instance
+  key_name = aws_key_pair.deployer.key_name
+
+  iam_instance_profile = aws_iam_instance_profile.server.id
+
+  # Use the configured security group
+  vpc_security_group_ids = [aws_security_group.instance.id]
+
+  # Use the subnet we created
+  subnet_id = aws_subnet.default.id
+
+  # Tell AWS to give the instance a public IP so that we 
+  # can SSH directly into it
+  associate_public_ip_address = true
+
+  tags = {
+    Name = var.aws_instance_name
+  }
+}
+
+# Attach port 80 of the instance to the instances load balancer target group
+resource "aws_lb_target_group_attachment" "server" { 
+    target_group_arn = aws_lb_target_group.instances.arn
+    target_id = aws_instance.server.id
+
+    # Use port 80 when contacting this instance from the target group
+    port = 80
+}
 
 # Resource policy that lets auxPlayer_role mount EBS volumes
 resource "aws_iam_role_policy" "mount_ebs_volumes" {
