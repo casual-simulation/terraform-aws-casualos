@@ -1,3 +1,8 @@
+
+output "aws_instance_ip" {
+    value = aws_instance.server.public_ip
+}
+
 output "ebs_volume" {
     value = <<EOM
 # volume registration

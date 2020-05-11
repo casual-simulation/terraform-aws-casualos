@@ -79,6 +79,9 @@ data "aws_ami" "server_ami" {
   }
 }
 
+# The list of availablility zones for the region
+data "aws_availability_zones" "available" {}
+
 # Create a VPC to launch our instances into
 resource "aws_vpc" "default" {
   cidr_block = "10.0.0.0/16"
@@ -98,8 +101,19 @@ resource "aws_route" "internet_access" {
 
 # Create a subnet to launch our instances into
 resource "aws_subnet" "default" {
+  # Make 2 subnets because we need subnets in 2 different
+  # availability zones for the load balancer.
+  count = "2"
+
   vpc_id                  = aws_vpc.default.id
-  cidr_block              = "10.0.1.0/24"
+
+  # Allocate CIDR blocks in 8 bit chuncks
+  # e.g. #1 = (10.0.1.0/8)
+  #      #2 = (10.0.2.0/8)
+  cidr_block        = cidrsubnet(aws_vpc.default.cidr_block, 8, count.index)
+
+  availability_zone = data.aws_availability_zones.available.names[count.index]
+
   map_public_ip_on_launch = true
 }
 
@@ -110,7 +124,7 @@ resource "aws_lb" "load_balancer" {
   load_balancer_type = "application"
 
   security_groups = [aws_security_group.load_balancer.id]
-  subnets = [aws_subnet.default.id]
+  subnets = aws_subnet.default.*.id
 }
 
 resource "aws_lb_target_group" "instances" {
@@ -280,7 +294,7 @@ resource "aws_instance" "server" {
   vpc_security_group_ids = [aws_security_group.instance.id]
 
   # Use the subnet we created
-  subnet_id = aws_subnet.default.id
+  subnet_id = aws_subnet.default.0.id
 
   # Tell AWS to give the instance a public IP so that we 
   # can SSH directly into it
@@ -324,7 +338,7 @@ data "aws_iam_policy_document" "mount_ebs_volumes" {
 
 # EBS volume used by MongoDB to store persistent data
 resource "aws_ebs_volume" "mongodb" {
-  availability_zone = aws_subnet.default.availability_zone
+  availability_zone = aws_instance.server.availability_zone
   size              = var.aws_ec2_block_size
 }
 
