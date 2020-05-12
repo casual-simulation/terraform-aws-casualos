@@ -2,9 +2,8 @@
     "min_packer_version": "0.12.0",
     "variables": {
       "aws_region": "us-east-1",
-      "nomad_version": "0.9.1",
-      "consul_module_version": "v0.7.4",
-      "consul_version": "1.5.1"
+      "nomad_version": "0.11.1",
+      "consul_version": "1.7.3"
     },
     "builders": [
       {
@@ -57,8 +56,7 @@
       {
         "type": "shell",
         "environment_vars": [
-            "CONSUL_VERSION={{user `consul_version`}}",
-            "CONSUL_MODULE_VERSION={{user `consul_module_version`}}"
+            "CONSUL_VERSION={{user `consul_version`}}"
         ],
         "script": "{{template_dir}}/install-consul.sh"
       }
