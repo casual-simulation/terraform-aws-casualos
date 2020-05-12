@@ -5,6 +5,8 @@ Requires=network-online.target
 After=network-online.target
 Wants=docker.service
 ConditionDirectoryNotEmpty=/etc/nomad.d
+StartLimitIntervalSec=10
+StartLimitBurst=3
 
 [Service]
 User=nomad
@@ -16,8 +18,6 @@ LimitNOFILE=infinity
 LimitNPROC=infinity
 Restart=on-failure
 RestartSec=2
-StartLimitBurst=3
-StartLimitIntervalSec=10
 TasksMax=infinity
 
 [Install]
