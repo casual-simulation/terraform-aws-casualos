@@ -30,7 +30,13 @@ job "casualos" {
 
       resources {
         cpu    = 500 # 500 MHz
-        memory = 512 # 512 MB
+        memory = 441 # 441 MB
+
+        network {
+          port "mongodb" {
+            static = 27017
+          }
+        }
       }
 
       service {
@@ -51,7 +57,13 @@ job "casualos" {
 
       resources {
         cpu    = 256 # 256 MHz
-        memory = 256 # 256 MB
+        memory = 128 # 128 MB
+
+        network {
+          port "redis" {
+            static = 6379
+          }
+        }
       }
 
       service {
@@ -87,6 +99,15 @@ job "casualos" {
       resources {
         cpu    = 500 # 500 MHz
         memory = 256 # 256MB
+
+        network {
+          port "http" {
+            static = 3000
+          }
+          port "websocket" {
+            static = 4567
+          }
+        }
       }
 
       service {
