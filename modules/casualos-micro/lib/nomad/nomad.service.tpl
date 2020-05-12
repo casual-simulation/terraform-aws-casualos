@@ -9,8 +9,10 @@ StartLimitIntervalSec=10
 StartLimitBurst=3
 
 [Service]
-User=nomad
-Group=nomad
+# TODO: Re-enable when this issue is fixed:
+# https://github.com/hashicorp/nomad/issues/7931
+# User=nomad
+# Group=nomad
 ExecStart=/opt/nomad/bin/nomad agent -config /etc/nomad.d
 KillMode=process
 KillSignal=SIGINT
