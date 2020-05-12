@@ -34,7 +34,7 @@ write_files:
         #!/bin/bash
         NEXT_WAIT_TIME=0
         ATTEMPTS=0
-        MAX_ATTEMPTS=5
+        MAX_ATTEMPTS=20
         until [ $ATTEMPTS -eq $MAX_ATTEMPTS ] || curl -o /home/ubuntu/bootstrap_token.json --request POST http://127.0.0.1:4646/v1/acl/bootstrap; do
           ATTEMPTS=$((ATTEMPTS + 1))
           NEXT_WAIT_TIME=$((NEXT_WAIT_TIME + 1))
