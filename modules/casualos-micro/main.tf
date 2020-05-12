@@ -323,17 +323,14 @@ resource "aws_lb_target_group_attachment" "server" {
 }
 
 # Resource policy that lets casualos_server mount EBS volumes
-# TODO: Re-enable when using CSI integration for Nomad.
-# resource "aws_iam_role_policy" "mount_ebs_volumes" {
-#   name   = "mount-ebs-volumes"
-#   role   = aws_iam_role.casualos_server.id
-#   policy = data.aws_iam_policy_document.mount_ebs_volumes.json
-# }
+resource "aws_iam_role_policy" "mount_ebs_volumes" {
+  name   = "mount-ebs-volumes"
+  role   = aws_iam_role.casualos_server.id
+  policy = data.aws_iam_policy_document.mount_ebs_volumes.json
+}
 
 # The policy document that gives the EC2 instance the ability to
-# List, mount, and attach EBS volumes. This was going to be used
-# for Container Storage Interface (CSI) integration in nomad,
-# but that seems to be fairly buggy at the moment.
+# List, mount, and attach EBS volumes.
 data "aws_iam_policy_document" "mount_ebs_volumes" {
   statement {
     effect = "Allow"
@@ -375,15 +372,6 @@ data "aws_iam_policy_document" "put_secretsmanager_secrets" {
 resource "aws_ebs_volume" "mongodb" {
   availability_zone = aws_subnet.default.0.availability_zone
   size              = var.aws_ec2_block_size
-}
-
-# Attach the mongodb volume to the server at the
-# /dev/sdh path
-# TODO: Disable when using CSI integration for nomad
-resource "aws_volume_attachment" "server_mongodb" { 
-  device_name = "/dev/sdh"
-  volume_id = aws_ebs_volume.mongodb.id
-  instance_id = aws_instance.server.id
 }
 
 data "template_file" "casualos_job" {
