@@ -6,6 +6,10 @@ job "casualos" {
   group "auxPlayer" {
     count = 1
 
+    restart {
+      mode = "delay"
+    }
+
     volume "mongodb" {
       type = "csi"
       read_only = false
