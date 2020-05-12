@@ -6,6 +6,12 @@ job "casualos" {
   group "auxPlayer" {
     count = 1
 
+    volume "mongodb" {
+      type = "csi"
+      read_only = false
+      source = "mongodb"
+    }
+
     task "mongo" {
       driver = "docker"
 
@@ -14,15 +20,12 @@ job "casualos" {
         port_map {
           mongodb = 27017
         }
+      }
 
-        mounts = [
-          {
-            type = "volume"
-            target = "/data/db"
-            source = "mongodb"
-            readonly = false
-          }
-        ]
+      volume_mount {
+        volume = "mongodb"
+        destination = "/data/db"
+        read_only = false
       }
 
       resources {
@@ -44,15 +47,6 @@ job "casualos" {
         port_map {
           redis = 6379
         }
-
-        mounts = [
-          {
-            type = "volume"
-            target = "/data"
-            source = "redis"
-            readonly = false
-          }
-        ]
       }
 
       resources {
