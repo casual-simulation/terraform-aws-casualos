@@ -8,6 +8,14 @@ job "plugin-aws-ebs-nodes" {
   type = "system"
 
   group "nodes" {
+
+    restart {
+      attempts = 5
+      delay = "1m"
+      interval = "10m"
+      mode = "delay"
+    }
+
     task "plugin" {
       driver = "docker"
 

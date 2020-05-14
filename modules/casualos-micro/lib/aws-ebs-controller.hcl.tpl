@@ -5,6 +5,14 @@ job "plugin-aws-ebs-controller" {
   datacenters = ["${aws_region}"]
 
   group "controller" {
+
+    restart {
+      attempts = 5
+      delay = "1m"
+      interval = "10m"
+      mode = "delay"
+    }
+
     task "plugin" {
       driver = "docker"
 
