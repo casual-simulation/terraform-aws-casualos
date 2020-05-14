@@ -1,7 +1,13 @@
+#!/bin/bash
+
+set -e
+
 sudo chmod +x /tmp/install-consul.sh
 /tmp/install-consul.sh --version "${CONSUL_VERSION}"
 
 # Setup DNS
+
+sudo mkdir -p /etc/systemd/resolved.conf.d
 
 # Set resolved.conf to use localhost for name resolution
 sudo cat > /etc/systemd/resolved.conf.d/consul.conf <<- EOM
@@ -22,13 +28,6 @@ sudo cat > /etc/systemd/resolved.conf.d/consul.conf <<- EOM
 DNS=127.0.0.1
 FallbackDNS=127.0.0.53
 Domains=~consul
-#LLMNR=no
-#MulticastDNS=no
-#DNSSEC=no
-#DNSOverTLS=no
-#Cache=yes
-#DNSStubListener=yes
-#ReadEtcHosts=yes
 EOM
 
 # Set the iptables to redirect queries for port 53 (DNS) to port 8600 (consul)
