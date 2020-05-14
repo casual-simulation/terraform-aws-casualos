@@ -280,11 +280,6 @@ resource "aws_iam_instance_profile" "server" {
 #   vpc_zone_identifier = [aws_subnet.default.id]
 # }
 
-# The Secret that the instance will update with the bootstrap token information
-resource "aws_secretsmanager_secret" "nomad_bootstrap_token" { 
-  name = "casualos/nomad/BootstrapToken"
-}
-
 # The EC2 instance that represents the server
 resource "aws_instance" "server" {
   # Needs the bootstrap token secret to be created first
@@ -352,29 +347,6 @@ data "aws_iam_policy_document" "mount_ebs_volumes" {
       "ec2:ModifyVolume"
     ]
     resources = ["*"]
-  }
-}
-
-# Resource policy that lets casualos_server set secretsmanager secrets
-resource "aws_iam_role_policy" "put_secretsmanager_secrets" {
-  name   = "put-secretsmanager-secrets"
-  role   = aws_iam_role.casualos_server.id
-  policy = data.aws_iam_policy_document.put_secretsmanager_secrets.json
-}
-
-# The policy document that gives the EC2 instance the ability to
-# Set a secret's value.
-data "aws_iam_policy_document" "put_secretsmanager_secrets" {
-  statement {
-    effect = "Allow"
-
-    actions = [
-      "secretsmanager:PutSecretValue",
-    ]
-    resources = [
-      # Allow access only to the nomad bootstrap token secret
-      aws_secretsmanager_secret.nomad_bootstrap_token.arn
-    ]
   }
 }
 
