@@ -425,3 +425,19 @@ resource "local_file" "aws_ebs_nodes_job_file" {
     content     = data.template_file.aws_ebs_nodes_job.rendered
     filename = "${path.module}/out/aws-ebs-nodes.hcl"
 }
+
+data "template_file" "aws_ebs_volume" {
+  template = file("${path.module}/lib/aws-ebs-volume.hcl.tpl")
+
+  vars = {
+    aws_ebs_volume_name = "mongodb"
+    aws_ebs_volume_id = aws_ebs_volume.mongodb.id
+    csi_plugin_id = "aws-ebs0"
+  }
+}
+
+# The nomad job file that can be used to run CasualOS.
+resource "local_file" "aws_ebs_volume_file" {
+    content     = data.template_file.aws_ebs_volume.rendered
+    filename = "${path.module}/out/abs-ebs-volume.hcl"
+}
