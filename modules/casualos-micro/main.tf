@@ -194,6 +194,14 @@ resource "aws_security_group" "instance" {
     cidr_blocks = ["10.0.0.0/16", var.zerotier_network_cidr]
   }
 
+  # AUX access from inside the VPC and ZeroTier
+  ingress {
+    from_port   = 3000
+    to_port     = 3000
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16", var.zerotier_network_cidr]
+  }
+
   # Nomad access from inside the VPC and ZeroTier
   ingress {
     from_port   = 4646
