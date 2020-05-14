@@ -436,3 +436,20 @@ resource "local_file" "aws_ebs_volume_file" {
     content     = data.template_file.aws_ebs_volume.rendered
     filename = "${path.module}/out/abs-ebs-volume.hcl"
 }
+
+data "aws_route53_zone" "primary" {
+  name    = var.aws_route53_hosted_zone_name
+}
+
+# Create an A record for the load balancer
+resource "aws_route53_record" "www" {
+  zone_id = data.aws_route53_zone.primary.zone_id
+  name    = var.aws_route53_subdomain_name
+  type    = "A"
+
+  alias {
+    name                   = aws_lb.load_balancer.dns_name
+    zone_id                = aws_lb.load_balancer.zone_id
+    evaluate_target_health = true
+  }
+}

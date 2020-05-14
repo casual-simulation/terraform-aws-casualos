@@ -6,3 +6,7 @@ output "aws_load_balancer_dns" {
 output "aws_instance_ip" {
     value = aws_instance.server.public_ip
 }
+
+output "domain_name" {
+    value = aws_route53_record.www.fqdn
+}
