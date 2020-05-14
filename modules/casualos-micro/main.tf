@@ -142,6 +142,25 @@ resource "aws_lb_listener" "load_balancer_http" {
   port = "80"
   protocol = "HTTP"
 
+  # Redirect to HTTPS by default
+  default_action {
+    type = "redirect"
+
+    redirect {
+      port        = "443"
+      protocol    = "HTTPS"
+      status_code = "HTTP_301"
+    }
+  }
+}
+
+# The HTTPS listener for the load balancer
+resource "aws_lb_listener" "load_balancer_https" {
+  load_balancer_arn = aws_lb.load_balancer.arn
+  port = "443"
+  protocol = "HTTPS"
+  certificate_arn = aws_acm_certificate.cert.arn
+
   default_action {
     type = "forward"
     target_group_arn = aws_lb_target_group.instances.arn
@@ -158,6 +177,14 @@ resource "aws_security_group" "load_balancer" {
   ingress {
     from_port   = 80
     to_port     = 80
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
+
+  # HTTPS access from anywhere
+  ingress {
+    from_port   = 443
+    to_port     = 443
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -451,5 +478,19 @@ resource "aws_route53_record" "www" {
     name                   = aws_lb.load_balancer.dns_name
     zone_id                = aws_lb.load_balancer.zone_id
     evaluate_target_health = true
+  }
+}
+
+# Create a certificate for the domain name
+resource "aws_acm_certificate" "cert" {
+  domain_name       = aws_route53_record.www.fqdn
+  validation_method = "DNS"
+
+  tags = {
+    Name = aws_route53_record.www.fqdn
+  }
+
+  lifecycle {
+    create_before_destroy = true
   }
 }
