@@ -202,6 +202,22 @@ resource "aws_security_group" "instance" {
     cidr_blocks = ["10.0.0.0/16", var.zerotier_network_cidr]
   }
 
+  # MongoDB access from inside the VPC and ZeroTier
+  ingress {
+    from_port   = 27017
+    to_port     = 27017
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16", var.zerotier_network_cidr]
+  }
+
+  # Redis access from inside the VPC and ZeroTier
+  ingress {
+    from_port   = 6379
+    to_port     = 6379
+    protocol    = "tcp"
+    cidr_blocks = ["10.0.0.0/16", var.zerotier_network_cidr]
+  }
+
   # outbound internet access
   egress {
     from_port   = 0
@@ -314,8 +330,8 @@ resource "aws_lb_target_group_attachment" "server" {
     target_group_arn = aws_lb_target_group.instances.arn
     target_id = aws_instance.server.id
 
-    # Use port 80 when contacting this instance from the target group
-    port = 80
+    # Use port 3000 when contacting this instance from the target group
+    port = 3000
 }
 
 # Resource policy that lets casualos_server mount EBS volumes

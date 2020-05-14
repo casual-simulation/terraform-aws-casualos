@@ -89,7 +89,6 @@ job "casualos" {
         image = "casualsimulation/aux:latest"
         port_map {
           http = 3000
-          websocket = 4567
         }
       }
 
@@ -107,9 +106,6 @@ job "casualos" {
         network {
           port "http" {
             static = 3000
-          }
-          port "websocket" {
-            static = 4567
           }
         }
       }
