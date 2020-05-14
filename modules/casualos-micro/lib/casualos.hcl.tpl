@@ -90,6 +90,9 @@ job "casualos" {
         port_map {
           http = 3000
         }
+
+        # Use the Consul DNS Server by default
+        dns_servers = ["${consul_dns_server}", "1.1.1.1"]
       }
 
       env {

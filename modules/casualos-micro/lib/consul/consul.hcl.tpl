@@ -12,13 +12,26 @@ datacenter = "${aws_region}"
 // (The AWS VPC)
 bind_addr = "{{ GetPrivateInterfaces | include \"network\" \"10.0.0.0/16\" | attr \"address\" }}"
 
+addresses = {
+  // Listen on all network interfaces
+  dns = "{{ GetPrivateInterfaces | attr \"address\" }}"
+  http = "0.0.0.0"
+}
+
+ports = {
+  dns = 53
+}
+
+recursors = ["1.1.1.1", "8.8.8.8", "8.8.4.4"]
+
+ui = true
+
 // TODO: Specify a go-sockaddr template for these
 // advertise_addr = "$$instance_ip_address",
 // bind_addr = "$$instance_ip_address",
 // client_addr = "0.0.0.0"
 
-// TODO: Setup UI
-ui = false
+
 
 // TODO: Configure Autopilot
 // autopilot {

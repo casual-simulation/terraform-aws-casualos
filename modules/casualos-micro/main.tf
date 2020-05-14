@@ -375,6 +375,7 @@ data "template_file" "casualos_job" {
 
   vars = {
     aws_region = var.aws_region
+    consul_dns_server = aws_instance.server.private_ip
   }
 }
 
