@@ -59,6 +59,10 @@
             "CONSUL_VERSION={{user `consul_version`}}"
         ],
         "script": "{{template_dir}}/install-consul.sh"
+      },
+      {
+        "type": "shell",
+        "script": "{{template_dir}}/install-zerotier.sh"
       }
     ]
   }
