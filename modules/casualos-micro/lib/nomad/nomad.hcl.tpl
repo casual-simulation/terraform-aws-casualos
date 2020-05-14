@@ -18,12 +18,6 @@ consul {
   address = "127.0.0.1:8500"
 }
 
-// TODO: Enable when this issue is resolved:
-// https://github.com/hashicorp/nomad/issues/7927
-// acl {
-//  enabled = true
-// }
-
 plugin "docker" {
   config {
     allow_privileged = true
