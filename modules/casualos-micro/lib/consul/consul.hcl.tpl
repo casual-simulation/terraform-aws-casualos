@@ -8,6 +8,10 @@ data_dir = "/opt/consul/data"
 bootstrap_expect = 1
 datacenter = "${aws_region}"
 
+// Set the Bind Address to use the interface that has an ip for the 10.0.x.x IP Address block.
+// (The AWS VPC)
+bind_addr = "{{ GetPrivateInterfaces | include \"network\" \"10.0.0.0/16\" | attr \"address\" }}"
+
 // TODO: Specify a go-sockaddr template for these
 // advertise_addr = "$$instance_ip_address",
 // bind_addr = "$$instance_ip_address",

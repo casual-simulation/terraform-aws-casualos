@@ -298,9 +298,6 @@ resource "aws_iam_instance_profile" "server" {
 
 # The EC2 instance that represents the server
 resource "aws_instance" "server" {
-  # Needs the bootstrap token secret to be created first
-  depends_on = [aws_secretsmanager_secret.nomad_bootstrap_token]
-
   ami           = data.aws_ami.server_ami.id
   instance_type = var.instance_type
   user_data     = data.template_cloudinit_config.cloudinit.rendered
