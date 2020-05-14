@@ -20,6 +20,10 @@ A Terraform module that deploys a micro instance of CasualOS to AWS.
 
 4. Run `terraform apply`
 
+5. If you specified the `zerotier_network` variable but did not specify an API key, go to your ZeroTier Network page and approve the new instance.
+    -   You can validate that it is correct by the instance IP. The ZeroTier members list should show the IP that was assigned to the instance.
+    -   You can also SSH into the instance and validate the node ID by running the following command: `sudo zerotier-cli status`
+
 [terraform]: https://www.terraform.io/
 [ami]: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/AMIs.html
 [nomad]: https://www.nomadproject.io/

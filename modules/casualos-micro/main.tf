@@ -44,6 +44,8 @@ data "template_file" "cloud_config" {
     consul_service = base64encode(data.template_file.consul_service.rendered)
     nomad_config  = base64encode(data.template_file.nomad_config.rendered)
     nomad_service = base64encode(data.template_file.nomad_service.rendered)
+    zerotier_network = var.zerotier_network
+    zerotier_api_key = var.zerotier_api_key
   }
 }
 
@@ -181,24 +183,23 @@ resource "aws_security_group" "instance" {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["0.0.0.0/0", "10.0.0.0/16", var.zerotier_network_cidr]
   }
 
-  # HTTP access from any other instance in the VPC
+  # HTTP access from any other instance in the VPC and ZeroTier
   ingress {
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = ["10.0.0.0/16"]
+    cidr_blocks = ["10.0.0.0/16", var.zerotier_network_cidr]
   }
 
-  # Nomad access from anywhere
-  # TODO: Make this secure
+  # Nomad access from inside the VPC and ZeroTier
   ingress {
     from_port   = 4646
     to_port     = 4646
     protocol    = "tcp"
-    cidr_blocks = ["0.0.0.0/0"]
+    cidr_blocks = ["10.0.0.0/16", var.zerotier_network_cidr]
   }
 
   # outbound internet access
