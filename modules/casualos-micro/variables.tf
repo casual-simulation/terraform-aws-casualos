@@ -1,4 +1,9 @@
 
+variable "name" {
+    type = string
+    description = "The name of the deployment. Must be all lowercase and not contain any symbols or spaces. (hyphens are allowed)"
+}
+
 variable "instance_type" {
   default = "t3.micro"
   description = "The AWS EC2 Instance type that should be deployed."
@@ -28,11 +33,6 @@ variable "aws_ami_owner" {
 variable "deployer_ssh_public_key" {
   type = string
   description = "The Public SSH Key (authorized_keys format) that should be automatically added to the new instance."
-}
-
-variable "aws_instance_name" {
-    default = "casualos"
-    description = "The name of the new instance"
 }
 
 variable "aws_ec2_block_size" {

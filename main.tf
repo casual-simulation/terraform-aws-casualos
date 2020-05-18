@@ -7,8 +7,11 @@ provider "aws" {
 module "casualos_server" {
     source = "./modules/casualos-micro"
 
+    name = "casualos"
+
     aws_region = var.aws_region
     aws_profile = var.aws_profile
+
     deployer_ssh_public_key = var.deployer_ssh_public_key
     zerotier_network  = var.zerotier_network
     zerotier_api_key  = var.zerotier_api_key

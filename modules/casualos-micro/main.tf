@@ -121,7 +121,7 @@ resource "aws_subnet" "default" {
 
 # Create a load balancer that provides access to the system
 resource "aws_lb" "load_balancer" { 
-  name = "casualos-alb"
+  name = "${var.name}-alb"
   internal = false
   load_balancer_type = "application"
 
@@ -130,7 +130,7 @@ resource "aws_lb" "load_balancer" {
 }
 
 resource "aws_lb_target_group" "instances" {
-  name = "casualos-tg-instances"
+  name = "${var.name}-tg-instances"
   port = 80
   protocol = "HTTP"
   vpc_id = aws_vpc.default.id
@@ -138,7 +138,7 @@ resource "aws_lb_target_group" "instances" {
 
 # A security group for the ELB so it is accessible via the web
 resource "aws_security_group" "load_balancer" {
-  name        = "casualos-sg-load_balancer"
+  name        = "${var.name}-sg-load_balancer"
   description = "Used by the load balancer"
   vpc_id      = aws_vpc.default.id
 
@@ -170,7 +170,7 @@ resource "aws_security_group" "load_balancer" {
 # Our default security group to access
 # the instances over SSH and HTTP
 resource "aws_security_group" "instance" {
-  name        = "casualos-sg-instance"
+  name        = "${var.name}-sg-instance"
   description = "Used for EC2 instances running CasualOS"
   vpc_id      = aws_vpc.default.id
 
@@ -232,7 +232,7 @@ resource "aws_security_group" "instance" {
 }
 
 resource "aws_key_pair" "deployer" {
-  key_name   = "casualos-deployer-key"
+  key_name   = "${var.name}-deployer-key"
   public_key = var.deployer_ssh_public_key
 }
 
@@ -254,14 +254,14 @@ data "aws_iam_policy_document" "ec2_trust_policy" {
 
 # The AWS Role for the server EC2 instance
 resource "aws_iam_role" "casualos_server" {
-  name = "casualos-instance-role"
+  name = "${var.name}-instance-role"
   path = "/"
   assume_role_policy = data.aws_iam_policy_document.ec2_trust_policy.json
 }
 
 # The IAM instance profile that the server uses
 resource "aws_iam_instance_profile" "server" {
-  name = "casualos-instance-profile"
+  name = "${var.name}-instance-profile"
   role = aws_iam_role.casualos_server.name
 }
 
@@ -322,7 +322,7 @@ resource "aws_instance" "server" {
   associate_public_ip_address = true
 
   tags = {
-    Name = var.aws_instance_name
+    Name = "${var.name}-instance"
   }
 }
 
@@ -337,7 +337,7 @@ resource "aws_lb_target_group_attachment" "server" {
 
 # Resource policy that lets casualos_server mount EBS volumes
 resource "aws_iam_role_policy" "mount_ebs_volumes" {
-  name   = "mount-ebs-volumes"
+  name   = "${var.name}-mount-ebs-volumes"
   role   = aws_iam_role.casualos_server.id
   policy = data.aws_iam_policy_document.mount_ebs_volumes.json
 }
