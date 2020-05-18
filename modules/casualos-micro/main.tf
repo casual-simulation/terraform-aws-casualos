@@ -136,37 +136,6 @@ resource "aws_lb_target_group" "instances" {
   vpc_id = aws_vpc.default.id
 }
 
-# The HTTP listener for the load balancer
-resource "aws_lb_listener" "load_balancer_http" {
-  load_balancer_arn = aws_lb.load_balancer.arn
-  port = "80"
-  protocol = "HTTP"
-
-  # Redirect to HTTPS by default
-  default_action {
-    type = "redirect"
-
-    redirect {
-      port        = "443"
-      protocol    = "HTTPS"
-      status_code = "HTTP_301"
-    }
-  }
-}
-
-# The HTTPS listener for the load balancer
-resource "aws_lb_listener" "load_balancer_https" {
-  load_balancer_arn = aws_lb.load_balancer.arn
-  port = "443"
-  protocol = "HTTPS"
-  certificate_arn = aws_acm_certificate.cert.arn
-
-  default_action {
-    type = "forward"
-    target_group_arn = aws_lb_target_group.instances.arn
-  }
-}
-
 # A security group for the ELB so it is accessible via the web
 resource "aws_security_group" "load_balancer" {
   name        = "casualos-sg-load_balancer"
@@ -417,7 +386,7 @@ data "template_file" "casualos_job" {
 # The nomad job file that can be used to run CasualOS.
 resource "local_file" "casualos_job_file" {
     content     = data.template_file.casualos_job.rendered
-    filename = "${path.module}/out/casualos.hcl"
+    filename = "${path.cwd}/out/casualos.hcl"
 }
 
 data "template_file" "aws_ebs_controller_job" {
@@ -431,7 +400,7 @@ data "template_file" "aws_ebs_controller_job" {
 # The nomad job file that can be used to run CasualOS.
 resource "local_file" "aws_ebs_controller_job_file" {
     content     = data.template_file.aws_ebs_controller_job.rendered
-    filename = "${path.module}/out/aws-ebs-controller.hcl"
+    filename = "${path.cwd}/out/aws-ebs-controller.hcl"
 }
 
 data "template_file" "aws_ebs_nodes_job" {
@@ -445,7 +414,7 @@ data "template_file" "aws_ebs_nodes_job" {
 # The nomad job file that can be used to run CasualOS.
 resource "local_file" "aws_ebs_nodes_job_file" {
     content     = data.template_file.aws_ebs_nodes_job.rendered
-    filename = "${path.module}/out/aws-ebs-nodes.hcl"
+    filename = "${path.cwd}/out/aws-ebs-nodes.hcl"
 }
 
 data "template_file" "aws_ebs_volume" {
@@ -461,36 +430,5 @@ data "template_file" "aws_ebs_volume" {
 # The nomad job file that can be used to run CasualOS.
 resource "local_file" "aws_ebs_volume_file" {
     content     = data.template_file.aws_ebs_volume.rendered
-    filename = "${path.module}/out/abs-ebs-volume.hcl"
-}
-
-data "aws_route53_zone" "primary" {
-  name    = var.aws_route53_hosted_zone_name
-}
-
-# Create an A record for the load balancer
-resource "aws_route53_record" "www" {
-  zone_id = data.aws_route53_zone.primary.zone_id
-  name    = var.aws_route53_subdomain_name
-  type    = "A"
-
-  alias {
-    name                   = aws_lb.load_balancer.dns_name
-    zone_id                = aws_lb.load_balancer.zone_id
-    evaluate_target_health = true
-  }
-}
-
-# Create a certificate for the domain name
-resource "aws_acm_certificate" "cert" {
-  domain_name       = aws_route53_record.www.fqdn
-  validation_method = "DNS"
-
-  tags = {
-    Name = aws_route53_record.www.fqdn
-  }
-
-  lifecycle {
-    create_before_destroy = true
-  }
+    filename = "${path.cwd}/out/abs-ebs-volume.hcl"
 }
