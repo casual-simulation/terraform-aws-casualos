@@ -22,3 +22,7 @@ output "subnet" {
 output "vpc" {
     value = aws_vpc.default
 }
+
+output "volume" {
+    value = aws_ebs_volume.mongodb
+}
