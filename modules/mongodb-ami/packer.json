@@ -31,6 +31,10 @@
     "provisioners": [
       {
         "type": "shell",
+        "script": "{{template_dir}}/upgrade.sh"
+      },
+      {
+        "type": "shell",
         "script": "{{template_dir}}/install-mongodb.sh"
       },
       {
