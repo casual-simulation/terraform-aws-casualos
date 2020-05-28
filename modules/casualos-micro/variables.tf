@@ -40,6 +40,12 @@ variable "aws_ec2_block_size" {
   description = "The size of the disk (in GiBs) that should be used to store CasualOS data."
 }
 
+variable "aws_snapshot_retain_days" {
+  default = 4
+  description = "The number of days that volume snapshots should be retained for."
+}
+
+
 variable "zerotier_network" {
   type = string
   default = ""
