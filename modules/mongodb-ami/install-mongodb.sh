@@ -13,3 +13,7 @@ sudo apt-get update || sudo apt update -y
 
 # Install MongoDB
 sudo apt-get install -y mongodb-org || sudo apt install -y mongodb-org
+
+# Create the data directory and chown it with the mongodb user.
+sudo mkdir -p /data/db
+sudo chown -R mongodb:mongodb /data/db
