@@ -14,3 +14,11 @@ output "load_balancer" {
 output "instances_target_lb_group" {
     value = aws_lb_target_group.instances
 }
+
+output "subnet" {
+    value = aws_subnet.default.0
+}
+
+output "vpc" {
+    value = aws_vpc.default
+}
