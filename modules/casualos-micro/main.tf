@@ -425,7 +425,7 @@ EOF
 }
 
 resource "aws_dlm_lifecycle_policy" "mongodb_backup" {
-  description        = "Backups for ${aws_ebs_volume.mongodb.id} (MongoDB Volume)"
+  description        = "Backups for the ${var.name} MongoDB volume"
   execution_role_arn = aws_iam_role.dlm_lifecycle_role.arn
   state              = "ENABLED"
 
