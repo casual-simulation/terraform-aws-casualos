@@ -26,36 +26,36 @@ variable "aws_eks_group_name" {
 }
 
 variable "casualos_version" {
-  type = string
-  default = "v1.1.4"
+  type        = string
+  default     = "v1.1.4"
   description = "The version of CasualOS to deploy."
 }
 
 variable "mongodb_chart_version" {
-  type = string
-  default = "7.14.5"
+  type        = string
+  default     = "7.14.5"
   description = "The version of the MongoDB Helm chart to deploy. See https://github.com/bitnami/charts/tree/master/bitnami/mongodb"
 }
 
 variable "redis_chart_version" {
-  type = string
-  default = "10.6.17"
+  type        = string
+  default     = "10.6.17"
   description = "The version of the Redis Helm chart to deploy. See https://github.com/bitnami/charts/tree/master/bitnami/redis"
 }
 
 variable "dashboard_chart_version" {
-  type = string
-  default = "2.0.1"
+  type        = string
+  default     = "2.0.1"
   description = "The version of the Dashboard Helm chart to deploy. See https://kubernetes.github.io/dashboard/"
 }
 
 variable "dashboard_image_tag" {
-   default = "v2.0.0-rc3"
-   description = "The Docker image tag that should be used for the Kubernetes dashboard deployment."
+  default     = "v2.0.0-rc3"
+  description = "The Docker image tag that should be used for the Kubernetes dashboard deployment."
 }
 
 variable "metrics_chart_version" {
-  type = string
-  default = "2.11.1"
+  type        = string
+  default     = "2.11.1"
   description = "The version of the Metrics Helm chart to deploy. Pulled from this repository: https://kubernetes-charts.storage.googleapis.com"
 }

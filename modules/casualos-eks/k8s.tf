@@ -34,14 +34,14 @@ resource "kubernetes_cluster_role_binding" "adminUserClusterAdmin" {
 }
 
 module "csi" {
-  source = "../eks-ebs-csi-driver"
-  cluster_name = local.cluster_name
+  source                  = "../eks-ebs-csi-driver"
+  cluster_name            = local.cluster_name
   cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
 }
 
 module "alb" {
-  source = "../eks-alb-ingress-controller"
-  cluster_name = local.cluster_name
+  source                  = "../eks-alb-ingress-controller"
+  cluster_name            = local.cluster_name
   cluster_oidc_issuer_url = module.eks.cluster_oidc_issuer_url
 }
 
