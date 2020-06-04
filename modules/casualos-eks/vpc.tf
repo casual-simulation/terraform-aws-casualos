@@ -2,7 +2,7 @@
 
 locals {
   vpc_name = "${local.cluster_name}-vpc"
-  azs      = ["us-east-1a", "us-east-1b"]
+  azs      = var.availability_zones
 
   # The tags that should be applied to the VPC.
   # EKS has special requirements so that their Kubernetes implementation knows
@@ -36,6 +36,11 @@ resource "aws_vpc" "default" {
   enable_dns_hostnames = true
 }
 
+output "vpc_id" {
+  value       = aws_vpc.default.id
+  description = "The ID of the VPC that was created for the cluster."
+}
+
 # Create our public subnets
 # These will house the load balancers.
 resource "aws_subnet" "public1" {
@@ -60,6 +65,11 @@ resource "aws_subnet" "public2" {
   }, local.tags, local.public_subnet_tags)
 }
 
+output "public_subnets" {
+  value       = [aws_subnet.public1.id, aws_subnet.public2.id]
+  description = "The IDs of the public subnets that were created in the cluster VPC."
+}
+
 # Create our private subnets
 # These will house the EC2 instances
 resource "aws_subnet" "private1" {
@@ -82,6 +92,11 @@ resource "aws_subnet" "private2" {
   tags = merge({
     Name = "${local.vpc_name}-private2"
   }, local.tags, local.private_subnet_tags)
+}
+
+output "private_subnets" {
+  value       = [aws_subnet.private1.id, aws_subnet.private2.id]
+  description = "The IDs of the private subnets that were created in the cluster VPC."
 }
 
 # Route Tables
@@ -143,6 +158,11 @@ resource "aws_internet_gateway" "public" {
   )
 }
 
+output "internet_gateway_id" {
+  value       = aws_internet_gateway.public.id
+  description = "The ID of the internet gateway that was created in the VPC."
+}
+
 # Create an elastic IP that the NAT gateway can use to access the internet.
 resource "aws_eip" "nat" {
   vpc = true
@@ -152,6 +172,11 @@ resource "aws_eip" "nat" {
     },
     local.tags,
   )
+}
+
+output "nat_eip_id" {
+  value       = aws_eip.nat.id
+  description = "The ID of the Elastic IP used for the cluster NAT gateway."
 }
 
 # Create a NAT gateway that allows the subnet to access the internet but not the other way around.
@@ -169,6 +194,11 @@ resource "aws_nat_gateway" "private" {
   )
 
   depends_on = [aws_internet_gateway.public]
+}
+
+output "nat_gateway_id" {
+  value       = aws_nat_gateway.private.id
+  description = "The ID of the NAT gateway that was created in the cluster VPC."
 }
 
 # Create routes for our route tables

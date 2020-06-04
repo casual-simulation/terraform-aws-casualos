@@ -8,6 +8,12 @@ variable "aws_region" {
   description = "AWS region"
 }
 
+variable "availability_zones" {
+  type        = list(string)
+  default     = ["us-east-1a", "us-east-1b"]
+  description = "The AWS availability zones that should be used."
+}
+
 variable "aws_profile" {
   type        = string
   default     = ""
