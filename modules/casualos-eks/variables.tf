@@ -65,3 +65,8 @@ variable "metrics_chart_version" {
   default     = "2.11.1"
   description = "The version of the Metrics Helm chart to deploy. Pulled from this repository: https://kubernetes-charts.storage.googleapis.com"
 }
+
+variable "certificate_arn" {
+  type        = string
+  description = "The ARN of the certificate that should be used for the CasualOS deployment. (required)"
+}

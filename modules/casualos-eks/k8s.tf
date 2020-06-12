@@ -396,13 +396,44 @@ resource "kubernetes_ingress" "casualos" {
       "kubernetes.io/ingress.class"           = "alb"
       "alb.ingress.kubernetes.io/target-type" = "ip"
       "alb.ingress.kubernetes.io/scheme"      = "internet-facing"
+
+      # Specify the ARN that should be used.
+      "alb.ingress.kubernetes.io/certificate-arn" = var.certificate_arn
+
+      # Listen on both HTTP port 80 and HTTPS port 443
+      "alb.ingress.kubernetes.io/listen-ports" = "[{\"HTTP\": 80}, {\"HTTPS\":443}]"
+
+      # Setup a custom ingress action named "ssl-redirect" which 301 redirects from port 80 to port 443
+      "alb.ingress.kubernetes.io/actions.ssl-redirect" = "{\"Type\": \"redirect\", \"RedirectConfig\": { \"Protocol\": \"HTTPS\", \"Port\": \"443\", \"StatusCode\": \"HTTP_301\"}}"
     }
   }
 
   spec {
-    backend {
-      service_name = "casualos"
-      service_port = "80"
+
+    rule {
+      http {
+
+        # First try redirecting to port 443.
+        # If this would cause an infinite loop, then Kubernetes will
+        # decide to skip this first rule and go to the second.
+        path {
+          path = "/*"
+          backend {
+            # The service name is the same as the action we specified in the annotation.
+            service_name = "ssl-redirect"
+            service_port = "use-annotation"
+          }
+        }
+
+        # Next, serve the CasualOS application
+        path {
+          path = "/*"
+          backend {
+            service_name = "casualos"
+            service_port = "80"
+          }
+        }
+      }
     }
   }
 }
