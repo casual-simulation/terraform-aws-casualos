@@ -70,3 +70,8 @@ variable "certificate_arn" {
   type        = string
   description = "The ARN of the certificate that should be used for the CasualOS deployment. (required)"
 }
+
+variable "sandbox_type" {
+  type        = string
+  description = "The sandbox mode you want CasualOS in - deno or use none"
+}

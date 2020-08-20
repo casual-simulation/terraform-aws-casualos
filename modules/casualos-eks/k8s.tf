@@ -268,6 +268,13 @@ resource "kubernetes_deployment" "casualos" {
           image = "casualsimulation/aux:${var.casualos_version}"
           name  = "casualos"
 
+          # Specify the sandbox type that
+          # CasualOS needs - e.g. deno or use none.
+          env {
+            name  = "SANDBOX_TYPE"
+            value = var.sandbox_type
+          }
+
           # Specify that port 3000 is the http port
           # Here, we give the port a name (http) that the service
           # can use to know where to send traffic.
