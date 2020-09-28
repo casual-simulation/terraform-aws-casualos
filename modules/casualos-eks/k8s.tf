@@ -274,6 +274,14 @@ resource "kubernetes_deployment" "casualos" {
             name  = "SANDBOX_TYPE"
             value = var.sandbox_type
           }
+          
+          # Specify the sandbox type that
+          # CasualOS needs - e.g. deno or use none.
+          env {
+            name  = "DEBUG"
+            value = var.debug
+          }
+
 
           # Specify that port 3000 is the http port
           # Here, we give the port a name (http) that the service
