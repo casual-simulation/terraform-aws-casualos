@@ -75,3 +75,8 @@ variable "sandbox_type" {
   type        = string
   description = "The sandbox mode you want CasualOS in - deno or use none"
 }
+
+variable "debug" {
+  type        = string
+  description = "debug mode helps debugging deno"
+}
