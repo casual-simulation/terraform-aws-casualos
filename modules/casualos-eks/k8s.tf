@@ -348,15 +348,15 @@ resource "kubernetes_deployment" "casualos" {
           # In this case, we're telling K8s to send a HTTP Get request
           # for the index path to port 3000. If it gets a valid response then the
           # container is running, otherwise it will record that the container has failed.
-          liveness_probe {
-            http_get {
-              path = "/"
-              port = 3000
-            }
+          # liveness_probe {
+          #   http_get {
+          #     path = "/"
+          #     port = 3000
+          #   }
 
-            initial_delay_seconds = 3
-            period_seconds        = 3
-          }
+          #   initial_delay_seconds = 3
+          #   period_seconds        = 3
+          # }
         }
       }
     }
