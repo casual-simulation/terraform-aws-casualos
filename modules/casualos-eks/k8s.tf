@@ -275,11 +275,18 @@ resource "kubernetes_deployment" "casualos" {
             value = var.sandbox_type
           }
           
-          # Specify the sandbox type that
-          # CasualOS needs - e.g. deno or use none.
+          # Specify debug state that
+          # deno needs - e.g. true or use none.
           env {
             name  = "DEBUG"
             value = var.debug
+          }
+
+          # Specify the sandbox type that
+          # CasualOS needs - e.g. deno or use none.
+          env {
+            name  = "NODE_OPTIONS"
+            value = var.node_options
           }
 
 

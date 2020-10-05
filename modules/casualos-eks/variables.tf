@@ -80,3 +80,8 @@ variable "debug" {
   type        = string
   description = "debug mode helps debugging deno"
 }
+
+variable "node_options" {
+  type        = string
+  description = "add node_options from node documentation"
+}
