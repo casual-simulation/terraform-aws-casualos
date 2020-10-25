@@ -74,7 +74,7 @@ module "eks" {
       name                 = "worker-group-1"
       instance_type        = "t3.small"
       additional_userdata  = "echo foo bar"
-      asg_desired_capacity = 1
+      asg_desired_capacity = 2
 
       # We can specify additional security groups that should be applied to each of the workers
       # in this group if we want.
