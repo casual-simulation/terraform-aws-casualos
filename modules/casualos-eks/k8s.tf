@@ -245,6 +245,10 @@ resource "kubernetes_deployment" "casualos" {
   }
 
   spec {
+    nodeSelector{
+      appnode = "casualos"
+    }
+
     # Only one replica for now since we don't support load
     # balancing due to the realtime connections.
     replicas = 1

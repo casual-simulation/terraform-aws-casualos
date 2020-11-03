@@ -75,6 +75,7 @@ module "eks" {
       instance_type        = "t3.small"
       additional_userdata  = "echo foo bar"
       asg_desired_capacity = 2
+      kubelet_extra_args   = "--node-labels=casualos.appnode=true"                          
 
       # We can specify additional security groups that should be applied to each of the workers
       # in this group if we want.
@@ -86,6 +87,7 @@ module "eks" {
       additional_userdata           = "echo foo bar"
       additional_security_group_ids = [aws_security_group.allow_vpc_ssh.id]
       asg_desired_capacity          = 1
+      kubelet_extra_args            = "--node-labels casualos.appnode=true"
     },
   ]
 
