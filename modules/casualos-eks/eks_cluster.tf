@@ -87,7 +87,7 @@ module "eks" {
       additional_userdata           = "echo foo bar"
       additional_security_group_ids = [aws_security_group.allow_vpc_ssh.id]
       asg_desired_capacity          = 1
-      kubelet_extra_args            = "--node-labels casualos.appnode=true"
+      kubelet_extra_args            = "--node-labels=casualos.appnode=true"
     },
   ]
 
