@@ -245,10 +245,6 @@ resource "kubernetes_deployment" "casualos" {
   }
 
   spec {
-    node_selector{
-      appnode = "casualos"
-    }
-
     # Only one replica for now since we don't support load
     # balancing due to the realtime connections.
     replicas = 1
@@ -267,6 +263,9 @@ resource "kubernetes_deployment" "casualos" {
       }
 
       spec {
+        node_selector{
+          appnode = "casualos"
+        }
         container {
           # Use the aux container from docker.
           image = "casualsimulation/aux:${var.casualos_version}"
