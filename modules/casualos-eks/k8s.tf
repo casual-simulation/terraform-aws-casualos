@@ -245,7 +245,7 @@ resource "kubernetes_deployment" "casualos" {
   }
 
   spec {
-    nodeSelector{
+    node_selector{
       appnode = "casualos"
     }
 
