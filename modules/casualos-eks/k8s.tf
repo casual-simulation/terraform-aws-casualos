@@ -264,7 +264,7 @@ resource "kubernetes_deployment" "casualos" {
 
       spec {
         node_selector = {
-          "appnode" = "casualos"
+          "casualos.appnode" = "true"
         }
         container {
           # Use the aux container from docker.
